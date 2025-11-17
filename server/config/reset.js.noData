@@ -1,0 +1,70 @@
+import './dotenv.js'
+import pool from './database.js'
+import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Helper functions for ES Modules environment
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Reads the schema.sql file from the project root directory.
+ * @returns {string} The content of the schema.sql file.
+ */
+const readSchema = () => {
+    // Navigate from server/config to the project root (.. / .. / schema.sql)
+    const schemaPath = path.join(__dirname, 'schema.sql');
+    try {
+        console.log(`Attempting to read schema from: ${schemaPath}`);
+        // Read the schema.sql file content synchronously
+        return readFileSync(schemaPath, 'utf-8');
+    } catch (error) {
+        console.error("Error reading schema.sql. Ensure it is located in the project root directory.", error);
+        throw error;
+    }
+}
+
+/**
+ * Executes the full SQL schema to create all financial tables.
+ * @param {string} sql The content of the schema.sql file.
+ */
+const createFinancialTables = async (sql) => {
+    try {
+        console.log('Resetting database and creating financial tables...');
+
+        // Execute the entire SQL script (creates all strategies, backtest, portfolio tables)
+        // Note: The script should handle dropping tables if they exist.
+        await pool.query(sql);
+
+        console.log('Financial database schema created successfully.');
+    } catch (error) {
+        console.error('Error creating financial tables. Check your PGUSER permissions and schema syntax.', error);
+        throw error;
+    }
+}
+
+/**
+ * Main function to reset the database.
+ */
+const resetDatabase = async () => {
+    let sqlSchema;
+    try {
+        // 1. Read the schema file
+        sqlSchema = readSchema();
+        
+        // 2. Execute the schema (creates all tables)
+        await createFinancialTables(sqlSchema);
+        
+        console.log('Database reset completed successfully.');
+    } catch (err) {
+        console.error('Database reset failed:', err);
+    } finally {
+        // 3. Close the connection pool
+        if (pool) {
+            await pool.end();
+        }
+    }
+}
+
+resetDatabase();

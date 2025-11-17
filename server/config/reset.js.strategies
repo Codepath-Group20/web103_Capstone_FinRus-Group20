@@ -1,0 +1,121 @@
+import './dotenv.js'
+import pool from './database.js'
+import { readFileSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Helper functions for ES Modules environment to get current directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/**
+ * Reads the schema.sql file from the same directory as reset.js (server/config).
+ * @returns {string} The content of the schema.sql file.
+ */
+const readSchema = () => {
+    // Looks in the current directory (server/config) for schema.sql
+    const schemaPath = path.join(__dirname, 'schema.sql');
+    try {
+        console.log(`Attempting to read schema from: ${schemaPath}`);
+        return readFileSync(schemaPath, 'utf-8');
+    } catch (error) {
+        console.error("Error reading schema.sql. Ensure it is located in the server/config directory.", error);
+        throw error;
+    }
+}
+
+/**
+ * Executes the full SQL schema to create all financial tables.
+ * This script drops existing tables and recreates them for a clean start.
+ * @param {string} sql The content of the schema.sql file.
+ */
+const createFinancialTables = async (sql) => {
+    try {
+        console.log('Resetting database and creating financial tables...');
+        // Execute the entire SQL script
+        await pool.query(sql);
+        console.log('Financial database schema created successfully.');
+    } catch (error) {
+        console.error('Error creating financial tables. Check your permissions and schema syntax.', error);
+        throw error;
+    }
+}
+
+/**
+ * Seeds the 'strategies' table with initial data.
+ */
+const seedStrategiesTable = async () => {
+    try {
+        console.log('Seeding strategies table with sample data...');
+        
+        const sampleStrategies = [
+            {
+                name: 'Golden Cross MA',
+                description: 'A classic strategy based on 50-day and 200-day moving average crossover signals.',
+                type: 'moving_average',
+                parameters: { short_period: 50, long_period: 200 }
+            },
+            {
+                name: 'RSI Overbought/Oversold',
+                description: 'Uses the Relative Strength Index (RSI) to identify overbought (>70) and oversold (<30) conditions.',
+                type: 'rsi',
+                parameters: { period: 14, overbought: 70, oversold: 30 }
+            },
+            {
+                name: 'MACD Crossover',
+                description: 'Buys when the MACD line crosses above the signal line and sells when it crosses below.',
+                type: 'macd',
+                parameters: { fast: 12, slow: 26, signal: 9 }
+            }
+        ];
+
+        // This query inserts the strategy data, using JSON.stringify for the parameters column.
+        const insertQuery = `
+            INSERT INTO strategies (name, description, type, parameters)
+            VALUES ($1, $2, $3, $4::jsonb)
+        `;
+
+        for (const strategy of sampleStrategies) {
+            await pool.query(insertQuery, [
+                strategy.name,
+                strategy.description,
+                strategy.type,
+                JSON.stringify(strategy.parameters)
+            ]);
+        }
+        
+        console.log('Strategies table seeded successfully.');
+    } catch (error) {
+        console.error('Error seeding strategies table:', error);
+        throw error;
+    }
+}
+
+
+/**
+ * Main function to reset the database.
+ */
+const resetDatabase = async () => {
+    let sqlSchema;
+    try {
+        // 1. Read the schema file
+        sqlSchema = readSchema();
+        
+        // 2. Execute the schema (creates all tables)
+        await createFinancialTables(sqlSchema);
+
+        // 3. Seed the initial data
+        await seedStrategiesTable();
+        
+        console.log('Database reset completed successfully.');
+    } catch (err) {
+        console.error('Database reset failed:', err);
+    } finally {
+        // 4. Close the connection pool
+        if (pool) {
+            await pool.end();
+        }
+    }
+}
+
+resetDatabase();

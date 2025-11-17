@@ -1,0 +1,236 @@
+import React, { useState, useEffect } from 'react';
+import { strategiesAPI } from '../services/api';
+
+// Define mock strategy types for the info section
+const strategyTypes = [
+    { value: 'SMA', label: 'Simple Moving Average', description: 'Crossover strategy using two SMAs.' },
+    { value: 'RSI', label: 'Relative Strength Index', description: 'Buy/Sell signals based on overbought/oversold levels.' },
+    { value: 'MACD', label: 'Moving Average Convergence Divergence', description: 'Uses the difference between two exponential moving averages.' },
+];
+
+function Strategies() {
+  const [strategies, setStrategies] = useState([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false); // For custom modal
+  const [strategyToDelete, setStrategyToDelete] = useState(null);
+
+  const [newStrategy, setNewStrategy] = useState({
+    name: '',
+    description: '',
+    type: 'SMA',
+    parameters: {} // Parameters will be filled out in a real form
+  });
+
+  useEffect(() => {
+    loadStrategies();
+  }, []);
+
+  const loadStrategies = async () => {
+    try {
+      const data = await strategiesAPI.getAll();
+      // MOCK DATA since we don't have a live server running
+      const mockStrategies = [
+        { id: 1, name: "Long-Term SMA", type: "SMA", description: "Buy when 50-day SMA crosses 200-day SMA.", created_at: new Date().toISOString() },
+        { id: 2, name: "Aggressive RSI Buy", type: "RSI", description: "Buy when RSI drops below 20.", created_at: new Date().toISOString() },
+      ];
+      setStrategies(data.strategies || mockStrategies);
+    } catch (err) {
+      console.error('Error loading strategies:', err);
+    }
+  };
+
+  const handleCreateStrategy = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // await strategiesAPI.create(newStrategy);
+      console.log("Creating strategy (MOCK):", newStrategy);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      
+      // MOCK: Add to list
+      const mockNewStrategy = { ...newStrategy, id: Date.now(), created_at: new Date().toISOString() };
+      setStrategies(prev => [...prev, mockNewStrategy]);
+
+      setShowCreateForm(false);
+      setNewStrategy({ name: '', description: '', type: 'SMA', parameters: {} });
+    } catch (err) {
+      console.error('Error creating strategy:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteStrategy = (id) => {
+    setStrategyToDelete(id);
+    setShowModal(true);
+  };
+  
+  const confirmDelete = async () => {
+    if (!strategyToDelete) return;
+    
+    try {
+      setLoading(true);
+      // await strategiesAPI.delete(strategyToDelete);
+      console.log(`Deleting strategy (MOCK): ${strategyToDelete}`);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API call
+      
+      // MOCK: Filter out the deleted strategy
+      setStrategies(prev => prev.filter(s => s.id !== strategyToDelete));
+      
+    } catch (err) {
+      console.error('Error deleting strategy:', err);
+    } finally {
+      setLoading(false);
+      setShowModal(false);
+      setStrategyToDelete(null);
+    }
+  }
+
+  // Helper for input change
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewStrategy(prev => ({ ...prev, [name]: value }));
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 sm:p-8">
+      <h1 className="text-4xl font-extrabold mb-8 text-teal-400">Strategy Management</h1>
+
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-white">Your Saved Strategies</h2>
+        <button
+          className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-500 transition-colors shadow-md"
+          onClick={() => setShowCreateForm(!showCreateForm)}
+        >
+          {showCreateForm ? 'Cancel Creation' : 'Create New Strategy'}
+        </button>
+      </div>
+
+      {/* Strategy Creation Form */}
+      {showCreateForm && (
+        <div className="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700/50 mb-8 max-w-lg mx-auto">
+          <h3 className="text-xl font-semibold mb-4 text-white">Strategy Details</h3>
+          <form onSubmit={handleCreateStrategy} className="space-y-4">
+            
+            <input 
+              type="text" 
+              name="name"
+              placeholder="Strategy Name" 
+              value={newStrategy.name}
+              onChange={handleInputChange}
+              required
+              className="w-full p-3 bg-gray-700 text-gray-200 border border-gray-600 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+            />
+            
+            <textarea
+              name="description"
+              placeholder="Brief description of the strategy logic..."
+              value={newStrategy.description}
+              onChange={handleInputChange}
+              rows="3"
+              className="w-full p-3 bg-gray-700 text-gray-200 border border-gray-600 rounded-lg focus:ring-teal-500 focus:border-teal-500 resize-none"
+            />
+
+            <select
+                name="type"
+                value={newStrategy.type}
+                onChange={handleInputChange}
+                className="w-full p-3 bg-gray-700 text-gray-200 border border-gray-600 rounded-lg focus:ring-teal-500 focus:border-teal-500"
+            >
+                {strategyTypes.map(st => (
+                    <option key={st.value} value={st.value}>{st.label}</option>
+                ))}
+            </select>
+            
+            <button 
+              type="submit" 
+              className="w-full px-4 py-3 text-lg font-semibold rounded-lg bg-teal-500 text-gray-900 hover:bg-teal-400 transition-colors disabled:bg-gray-600"
+              disabled={loading}
+            >
+              {loading ? 'Saving...' : 'Save Strategy'}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Strategy List */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {strategies.length === 0 && !loading ? (
+          <div className="col-span-full text-center p-10 bg-gray-800 rounded-xl shadow-lg border border-gray-700">
+            <h3 className="text-xl font-semibold">No Strategies Yet</h3>
+            <p className="text-gray-400">Create your first trading strategy to get started!</p>
+          </div>
+        ) : (
+          strategies.map((strategy) => (
+            <div key={strategy.id} className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 hover:border-teal-500 transition-colors">
+              <div className="flex justify-between items-start mb-3">
+                <h3 className="text-xl font-bold text-white">{strategy.name}</h3>
+                <span className="px-3 py-1 text-xs font-semibold rounded-full bg-teal-700 text-teal-100 uppercase">
+                  {strategy.type}
+                </span>
+              </div>
+              <p className="text-gray-400 mb-4 text-sm">
+                {strategy.description || 'No description provided.'}
+              </p>
+              <div className="flex justify-between items-center border-t border-gray-700 pt-4">
+                <div className="text-sm text-gray-500">
+                  Created: {new Date(strategy.created_at).toLocaleDateString()}
+                </div>
+                <button 
+                  className="px-4 py-2 text-sm font-semibold rounded-lg bg-red-700 text-white hover:bg-red-600 transition-colors"
+                  onClick={() => handleDeleteStrategy(strategy.id)}
+                  disabled={loading}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Strategy Type Info Section */}
+      <div className="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700">
+        <h2 className="text-2xl font-semibold mb-4 text-white border-b border-gray-700 pb-2">
+            Available Strategy Types
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {strategyTypes.map(st => (
+            <div key={st.value} className="p-4 bg-gray-700 rounded-lg">
+              <h4 className="text-lg font-bold text-teal-400 mb-1">{st.label}</h4>
+              <p className="text-gray-300 text-sm">{st.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      {/* Custom Delete Confirmation Modal (Replaces window.confirm) */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-8 rounded-xl max-w-sm w-full shadow-2xl border border-red-700">
+            <h3 className="text-xl font-bold text-red-400 mb-4">Confirm Deletion</h3>
+            <p className="text-gray-300 mb-6">Are you sure you want to delete this strategy? This action cannot be undone.</p>
+            <div className="flex justify-end space-x-3">
+              <button 
+                className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
+                onClick={confirmDelete}
+              >
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Strategies;

@@ -8,7 +8,10 @@ password:process.env.PGPASSWORD,
 host:process.env.PGHOST,
 port:process.env.PGPORT,
 database:process.env.PGDATABASE,
-ssl:{rejectUnauthorized:false}
+// ssl:{rejectUnauthorized:false}
 }
 // Create a new pool instance
-export const pool=new pg.Pool(config)
+// FIX: Separate const declaration from export default
+const pool = new pg.Pool(config)
+
+export default pool;
