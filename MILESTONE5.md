@@ -80,8 +80,9 @@ Complete the checklist below detailing each baseline, custom, and stretch featur
 
 ## Final Demo GIF
 
-🔗 [Here's a GIF walkthrough of the final project](👉🏾👉🏾👉🏾 your link here)
-Peek-final-features-Group20.gif
+🔗 [Here's a GIF walkthrough of the final project](./Peek-final-features-Group20.gif)
+
+![Final Demo GIF](./Peek-final-features-Group20.gif)
 
 ## Reflection
 
