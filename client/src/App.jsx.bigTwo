@@ -1,0 +1,865 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
+} from 'recharts';
+
+// --- HELPER FUNCTIONS & MOCK APIs (All in one file) ---
+
+const formatCurrency = (amount) => {
+    // Check if the amount is null/undefined or not a number, return a safe string
+    if (amount === null || amount === undefined || isNaN(Number(amount))) {
+        return '$0.00';
+    }
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(amount);
+};
+
+const generateMockTrade = (index, entryPrice) => {
+    const isWin = Math.random() > 0.45; // 55% chance of win
+    const profitRatio = isWin ? (0.01 + Math.random() * 0.04) : -(0.01 + Math.random() * 0.02);
+    const profit = entryPrice * profitRatio;
+    const exitPrice = entryPrice + profit;
+    const returnPct = profitRatio * 100;
+
+    return {
+        entryDate: `2023-01-${String(10 + index * 5).padStart(2, '0')}`,
+        exitDate: `2023-01-${String(15 + index * 5).padStart(2, '0')}`,
+        entryPrice: entryPrice,
+        exitPrice: exitPrice,
+        quantity: 10,
+        profit: profit * 10, // Total P&L (10 shares)
+        returnPct: returnPct,
+    };
+};
+
+const mockBacktestAPI = async (params) => {
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+
+    const initialCapital = parseFloat(params.initialCapital);
+    const totalTrades = 20;
+    let trades = [];
+    let currentCapital = initialCapital;
+    let winCount = 0;
+
+    // Generate trades
+    for (let i = 0; i < totalTrades; i++) {
+        const entryPrice = 100 + Math.random() * 50;
+        const trade = generateMockTrade(i, entryPrice);
+        
+        if (trade.profit >= 0) {
+            winCount++;
+        }
+        trades.push(trade);
+    }
+    
+    // Recalculate equity curve after all trades are generated
+    let equityCurve = [{ date: params.startDate, equity: initialCapital }];
+    let maxEquity = initialCapital;
+    let maxDrawdown = 0;
+
+    trades.forEach((trade) => {
+        currentCapital += trade.profit;
+        if (currentCapital > maxEquity) {
+            maxEquity = currentCapital;
+        }
+        const drawdown = (maxEquity - currentCapital) / maxEquity * 100;
+        if (drawdown > maxDrawdown) {
+            maxDrawdown = drawdown;
+        }
+        equityCurve.push({ date: trade.exitDate, equity: currentCapital });
+    });
+
+    const totalReturn = ((currentCapital - initialCapital) / initialCapital) * 100;
+    const winRate = (winCount / totalTrades) * 100;
+    
+    // Final capital is the last equity value
+    const finalCapital = equityCurve[equityCurve.length - 1].equity;
+
+    return {
+        success: true,
+        strategyName: params.strategyType === 'SMA' ? `SMA(${params.shortPeriod}/${params.longPeriod})` : `RSI(${params.rsiPeriod})`,
+        symbol: params.symbol,
+        startDate: params.startDate,
+        endDate: params.endDate,
+        initialCapital: initialCapital,
+        finalCapital: finalCapital,
+        totalReturn: totalReturn,
+        sharpeRatio: (totalReturn / 15).toFixed(2),
+        maxDrawdown: -maxDrawdown.toFixed(2),
+        winRate: winRate.toFixed(2),
+        totalTrades: totalTrades,
+        trades: trades,
+        equityCurve: equityCurve
+    };
+};
+
+// --- COMPONENT: Home Page ---
+
+const HomePage = () => {
+    return (
+        <div className="p-6 md:p-12 max-w-7xl mx-auto space-y-12">
+            <div className="text-center py-16 bg-white rounded-xl shadow-lg border border-gray-100">
+                <div className="flex justify-center mb-6">
+                    {/* Placeholder Logo Icon */}
+                    <svg className="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8m-3 7H4a2 2 0 01-2-2V5a2 2 0 012-2h5m5 16l-8-8"></path>
+                    </svg>
+                </div>
+                <h1 className="text-5xl font-extrabold text-gray-900 mb-4">Welcome to FinRus</h1>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Your comprehensive financial backtesting and portfolio monitoring platform.
+                </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+                <FeatureCard 
+                    icon="📈" 
+                    title="Backtesting" 
+                    description="Test your trading strategies against historical data. Analyze performance metrics including returns, Sharpe ratio, and maximum drawdown." 
+                    link="/backtest" 
+                    linkText="Start Backtesting →"
+                />
+                <FeatureCard 
+                    icon="💼" 
+                    title="Portfolio Monitoring" 
+                    description="Track your investments in real-time. Monitor positions, calculate unrealized P&L, and analyze portfolio performance." 
+                    link="/portfolio" 
+                    linkText="View Portfolio →"
+                />
+                <FeatureCard 
+                    icon="🎯" 
+                    title="Trading Strategies" 
+                    description="Create and manage custom trading strategies. Choose from SMA crossovers, RSI indicators, MACD, and more." 
+                    link="/strategies" 
+                    linkText="Explore Strategies →"
+                />
+            </div>
+
+            <CallToAction />
+        </div>
+    );
+};
+
+const FeatureCard = ({ icon, title, description, link, linkText }) => (
+    <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300 border border-gray-100 flex flex-col justify-between">
+        <div className="text-4xl mb-4">{icon}</div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-3">{title}</h3>
+        <p className="text-gray-600 mb-6 flex-grow">{description}</p>
+        <Link to={link} className="text-blue-600 hover:text-blue-800 font-medium transition duration-150">
+            {linkText}
+        </Link>
+    </div>
+);
+
+const CallToAction = () => (
+    <div className="bg-blue-600 text-white p-10 rounded-lg shadow-2xl text-center">
+        <h2 className="text-3xl font-bold mb-4">Ready to get started?</h2>
+        <p className="mb-8 text-lg">Run your first backtest or create a portfolio to begin monitoring your investments.</p>
+        <div className="flex justify-center space-x-4">
+            <Link to="/backtest">
+                <button className="bg-white text-blue-600 font-semibold py-3 px-8 rounded-full shadow-md hover:bg-gray-100 transition duration-150 transform hover:scale-105">
+                    Run Backtest
+                </button>
+            </Link>
+            <Link to="/portfolio">
+                <button className="bg-blue-800 text-white font-semibold py-3 px-8 rounded-full border border-blue-400 hover:bg-blue-700 transition duration-150 transform hover:scale-105">
+                    Create Portfolio
+                </button>
+            </Link>
+        </div>
+    </div>
+);
+
+
+// --- COMPONENT: Backtest Page (Fixed logic) ---
+
+const MetricCard = ({ title, value, unit }) => {
+    const numericValue = parseFloat(value);
+    const isPositive = numericValue >= 0;
+
+    let valueClass = 'text-2xl font-bold';
+    let displayValue = value;
+
+    if (unit === '%' || unit === '$') {
+        if (isPositive) {
+            valueClass += ' text-green-600';
+        } else if (unit !== '$' || numericValue !== 0) {
+            valueClass += ' text-red-600';
+        }
+    } else {
+         valueClass += ' text-gray-800';
+    }
+
+    if (unit === '$') {
+        displayValue = formatCurrency(numericValue);
+    } else if (unit === '%') {
+        displayValue = `${numericValue.toFixed(2)}%`;
+    } else {
+        displayValue = numericValue.toFixed(2);
+    }
+
+    return (
+        <div className="p-4 bg-gray-50 rounded-lg shadow-sm border border-gray-200">
+            <p className="text-sm text-gray-500 mb-1 uppercase tracking-wider">{title}</p>
+            <p className={valueClass}>{displayValue}</p>
+        </div>
+    );
+};
+
+const BacktestPage = () => {
+    const [formData, setFormData] = useState({
+        strategyType: 'SMA',
+        symbol: 'AAPL',
+        startDate: '2023-01-01',
+        endDate: '2023-12-31',
+        initialCapital: 10000,
+        shortPeriod: 20,
+        longPeriod: 50,
+        rsiPeriod: 14,
+        oversold: 30,
+        overbought: 70
+    });
+
+    const [loading, setLoading] = useState(false);
+    const [results, setResults] = useState(null);
+    const [error, setError] = useState(null);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: name === 'initialCapital' || name.includes('Period') || name.includes('sold') || name.includes('bought')
+                ? parseFloat(value) || 0
+                : value.toUpperCase() // Symbol is capitalized
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setResults(null);
+        setError(null);
+
+        // Basic form validation (simplified for demo)
+        if (formData.initialCapital <= 0 || (formData.strategyType === 'SMA' && formData.shortPeriod >= formData.longPeriod)) {
+             setError("Invalid parameters. Check capital and period settings.");
+             setLoading(false);
+             return;
+        }
+
+        try {
+            const data = await mockBacktestAPI(formData);
+            setResults(data);
+        } catch (err) {
+            console.error('Backtest Error:', err);
+            setError('Failed to run backtest. See console.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const StrategySpecificInputs = () => {
+        if (formData.strategyType === 'SMA') {
+            return (
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <label htmlFor="shortPeriod" className="block text-sm font-medium text-gray-700">Short SMA Period</label>
+                        <input
+                            type="number" id="shortPeriod" name="shortPeriod" value={formData.shortPeriod}
+                            onChange={handleInputChange} required min="1"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label htmlFor="longPeriod" className="block text-sm font-medium text-gray-700">Long SMA Period</label>
+                        <input
+                            type="number" id="longPeriod" name="longPeriod" value={formData.longPeriod}
+                            onChange={handleInputChange} required min={formData.shortPeriod + 1}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                </div>
+            );
+        }
+
+        if (formData.strategyType === 'RSI') {
+            return (
+                <>
+                    <div className="space-y-1 mb-4">
+                        <label htmlFor="rsiPeriod" className="block text-sm font-medium text-gray-700">RSI Period</label>
+                        <input
+                            type="number" id="rsiPeriod" name="rsiPeriod" value={formData.rsiPeriod}
+                            onChange={handleInputChange} required min="1"
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label htmlFor="oversold" className="block text-sm font-medium text-gray-700">Oversold Threshold</label>
+                            <input
+                                type="number" id="oversold" name="oversold" value={formData.oversold}
+                                onChange={handleInputChange} required min="0" max="50"
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label htmlFor="overbought" className="block text-sm font-medium text-gray-700">Overbought Threshold</label>
+                            <input
+                                type="number" id="overbought" name="overbought" value={formData.overbought}
+                                onChange={handleInputChange} required min="51" max="100"
+                                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                    </div>
+                </>
+            );
+        }
+        return null;
+    };
+
+    const BacktestForm = () => (
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-fit sticky top-4">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3">Strategy Parameters</h2>
+
+            <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="space-y-1">
+                    <label htmlFor="strategyType" className="block text-sm font-medium text-gray-700">Strategy</label>
+                    <select
+                        id="strategyType" name="strategyType" value={formData.strategyType}
+                        onChange={handleInputChange} required
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    >
+                        <option value="SMA">SMA Crossover</option>
+                        <option value="RSI">RSI</option>
+                    </select>
+                </div>
+
+                <div className="space-y-1">
+                    <label htmlFor="symbol" className="block text-sm font-medium text-gray-700">Symbol (e.g., AAPL)</label>
+                    <input
+                        type="text" id="symbol" name="symbol" value={formData.symbol}
+                        onChange={handleInputChange} required maxLength="10"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 uppercase"
+                    />
+                </div>
+            </div>
+
+            <div className="space-y-1 mb-4">
+                <label htmlFor="initialCapital" className="block text-sm font-medium text-gray-700">Initial Capital ($)</label>
+                <input
+                    type="number" id="initialCapital" name="initialCapital" value={formData.initialCapital}
+                    onChange={handleInputChange} required min="100" step="1"
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="space-y-1">
+                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input
+                        type="date" id="startDate" name="startDate" value={formData.startDate}
+                        onChange={handleInputChange} required
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">End Date</label>
+                    <input
+                        type="date" id="endDate" name="endDate" value={formData.endDate}
+                        onChange={handleInputChange} required
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+            </div>
+
+            <div className="mb-6 pt-4 border-t border-gray-200">
+                <h3 className="text-lg font-medium text-gray-800 mb-4">Strategy Details</h3>
+                <StrategySpecificInputs />
+            </div>
+
+            <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-150 disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+                {loading ? (
+                    <div className="flex items-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Running Backtest...
+                    </div>
+                ) : (
+                    `Run ${formData.strategyType} Strategy Backtest`
+                )}
+            </button>
+
+            {error && <div className="mt-4 p-3 bg-red-100 text-red-700 border border-red-300 rounded-lg">{error}</div>}
+        </form>
+    );
+
+    return (
+        <div className="p-6 md:p-12 max-w-7xl mx-auto space-y-8">
+            <h1 className="text-4xl font-extrabold text-gray-900">Strategy Backtesting</h1>
+            <p className="text-lg text-gray-600">Test your trading ideas against historical data using a wide range of technical strategies.</p>
+
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* 1. Parameter Form (1/3 width on desktop) */}
+                <div className="lg:col-span-1">
+                    <BacktestForm />
+                </div>
+
+                {/* 2. Results Display (2/3 width on desktop) */}
+                <div className="lg:col-span-2 space-y-8">
+                    {results ? (
+                        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                                Results for {results.strategyName} on {results.symbol}
+                            </h2>
+                            <p className="text-gray-500 mb-6">
+                                Backtest Period: {results.startDate} to {results.endDate}
+                            </p>
+
+                            {/* Performance Metrics Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+                                <MetricCard title="Total Return" value={results.totalReturn} unit="%" />
+                                <MetricCard title="Final Capital" value={results.finalCapital} unit="$" />
+                                <MetricCard title="Sharpe Ratio" value={results.sharpeRatio} unit="ratio" />
+                                <MetricCard title="Max Drawdown" value={results.maxDrawdown} unit="%" />
+                                <MetricCard title="Win Rate" value={results.winRate} unit="%" />
+                                <MetricCard title="Total Trades" value={results.totalTrades} unit="" />
+                                <MetricCard title="Initial Capital" value={results.initialCapital} unit="$" />
+                            </div>
+
+                            <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Equity Curve</h3>
+                            <div className="w-full h-[400px] p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart
+                                        data={results.equityCurve}
+                                        margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                                        <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+                                        <YAxis
+                                            tickFormatter={(value) => formatCurrency(value)}
+                                            domain={['auto', 'auto']}
+                                            tick={{ fontSize: 10 }}
+                                        />
+                                        <Tooltip
+                                            formatter={(value) => [formatCurrency(value), 'Equity']}
+                                            labelFormatter={(label) => `Date: ${label}`}
+                                        />
+                                        <Legend />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="equity"
+                                            stroke="#1e3a8a" // Darker blue
+                                            strokeWidth={2}
+                                            dot={false}
+                                            name="Portfolio Equity"
+                                        />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            <h3 className="text-xl font-semibold text-gray-800 mt-8 mb-4 border-b pb-2">Trade History</h3>
+                            <div className="overflow-x-auto bg-gray-50 rounded-lg border border-gray-200">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-100">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entry Date</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exit Date</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entry Price</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">P&L ($)</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Return (%)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {results.trades.map((trade, index) => (
+                                            <tr key={index}>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{trade.entryDate}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{trade.exitDate}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(trade.entryPrice)}</td>
+                                                <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${trade.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {formatCurrency(trade.profit)}
+                                                </td>
+                                                <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${trade.returnPct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                    {trade.returnPct.toFixed(2)}%
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="p-10 bg-white rounded-xl shadow-lg border border-gray-100 text-center">
+                            <h3 className="text-2xl font-semibold text-gray-800 mb-2">Run a Backtest</h3>
+                            <p className="text-gray-500">
+                                Enter your strategy parameters on the left and click "Run Backtest" to generate and visualize historical performance results.
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- COMPONENT: Portfolio Page (Mocked) ---
+
+const mockPortfolios = [
+    { id: 1, name: 'Growth Portfolio', initialCapital: 50000, currentValue: 62500, created_at: '2023-01-01' },
+    { id: 2, name: 'Dividend Income', initialCapital: 10000, currentValue: 10850, created_at: '2023-06-15' },
+];
+
+const mockPositions = (portfolioId) => {
+    if (portfolioId === 1) {
+        return [
+            { id: 101, symbol: 'MSFT', quantity: 100, averagePrice: 300.50, currentPrice: 420.75 },
+            { id: 102, symbol: 'GOOGL', quantity: 50, averagePrice: 120.00, currentPrice: 155.20 },
+        ];
+    }
+    return [
+        { id: 201, symbol: 'JNJ', quantity: 200, averagePrice: 150.00, currentPrice: 165.90 },
+    ];
+};
+
+const PortfolioPage = () => {
+    const [portfolios, setPortfolios] = useState(mockPortfolios);
+    const [selectedPortfolio, setSelectedPortfolio] = useState(null);
+    const [positions, setPositions] = useState([]);
+
+    useEffect(() => {
+        if (selectedPortfolio) {
+            setPositions(mockPositions(selectedPortfolio.id));
+        }
+    }, [selectedPortfolio]);
+
+    const handleSelectPortfolio = (portfolio) => {
+        setSelectedPortfolio(portfolio);
+    };
+    
+    // Calculate portfolio summary
+    const portfolioSummary = useMemo(() => {
+        if (!selectedPortfolio) return {};
+
+        const totalMarketValue = positions.reduce((sum, pos) => sum + (pos.currentPrice * pos.quantity), 0);
+        const totalCostBasis = positions.reduce((sum, pos) => sum + (pos.averagePrice * pos.quantity), 0);
+        const unrealizedPnL = totalMarketValue - totalCostBasis;
+        const totalReturnPct = totalCostBasis > 0 ? (unrealizedPnL / totalCostBasis) * 100 : 0;
+
+        return {
+            totalMarketValue,
+            totalCostBasis,
+            unrealizedPnL,
+            totalReturnPct
+        };
+    }, [positions, selectedPortfolio]);
+
+    return (
+        <div className="p-6 md:p-12 max-w-7xl mx-auto space-y-8">
+            <h1 className="text-4xl font-extrabold text-gray-900">Portfolio Monitoring</h1>
+            <p className="text-lg text-gray-600">Track your investments, positions, and performance metrics in real-time.</p>
+
+            <div className="grid lg:grid-cols-4 gap-8">
+                {/* Portfolio List (1/4 width) */}
+                <div className="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <h2 className="text-xl font-semibold mb-4 border-b pb-2">Your Portfolios</h2>
+                    <ul className="space-y-3">
+                        {portfolios.map(p => (
+                            <li
+                                key={p.id}
+                                onClick={() => handleSelectPortfolio(p)}
+                                className={`cursor-pointer p-3 rounded-lg transition duration-150 border ${selectedPortfolio?.id === p.id ? 'bg-blue-50 border-blue-400 text-blue-800 font-medium' : 'hover:bg-gray-50 border-gray-200 text-gray-700'}`}
+                            >
+                                <span className="block text-lg">{p.name}</span>
+                                <span className="text-sm text-gray-500">Value: {formatCurrency(p.currentValue)}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                {/* Portfolio Details (3/4 width) */}
+                <div className="lg:col-span-3 space-y-8">
+                    {selectedPortfolio ? (
+                        <>
+                            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <h2 className="text-3xl font-bold mb-4">{selectedPortfolio.name} Summary</h2>
+                                
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <MetricCard title="Total Market Value" value={portfolioSummary.totalMarketValue} unit="$" />
+                                    <MetricCard title="Total Cost Basis" value={portfolioSummary.totalCostBasis} unit="$" />
+                                    <MetricCard title="Unrealized P&L" value={portfolioSummary.unrealizedPnL} unit="$" />
+                                    <MetricCard title="Total Return" value={portfolioSummary.totalReturnPct} unit="%" />
+                                </div>
+                            </div>
+                            
+                            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <h3 className="text-2xl font-semibold mb-4 border-b pb-2">Positions</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200">
+                                        <thead className="bg-gray-100">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Price</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Price</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market Value</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unrealized P&L</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-200">
+                                            {positions.map(pos => {
+                                                const marketValue = pos.quantity * pos.currentPrice;
+                                                const pnl = pos.quantity * (pos.currentPrice - pos.averagePrice);
+                                                return (
+                                                    <tr key={pos.id}>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{pos.symbol}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{pos.quantity}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(pos.averagePrice)}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(pos.currentPrice)}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrency(marketValue)}</td>
+                                                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                                            {formatCurrency(pnl)}
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="p-10 bg-white rounded-xl shadow-lg border border-gray-100 text-center">
+                            <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Portfolio Selected</h3>
+                            <p className="text-gray-500">Please select a portfolio from the list on the left to view its positions and performance details.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- COMPONENT: Strategies Page (Mocked) ---
+
+const mockStrategyTypes = [
+    { value: 'SMA', label: 'SMA Crossover', description: 'Simple Moving Average crossover. Buy when short crosses above long.' },
+    { value: 'RSI', label: 'RSI', description: 'Relative Strength Index. Buy on oversold, sell on overbought.' },
+    { value: 'MACD', label: 'MACD Crossover', description: 'Moving Average Convergence Divergence crossover strategy.' },
+];
+
+const mockUserStrategies = [
+    { id: 1, name: 'My Aggressive SMA', type: 'SMA', description: 'SMA 10/20 crossover on 1-hour chart.', created_at: '2024-01-10' },
+    { id: 2, name: 'Conservative RSI', type: 'RSI', description: 'RSI(14) with 30/70 thresholds on daily chart.', created_at: '2024-03-25' },
+];
+
+const StrategiesPage = () => {
+  const [strategies, setStrategies] = useState(mockUserStrategies);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newStrategy, setNewStrategy] = useState({ name: '', description: '', type: 'SMA' });
+
+  // Mock handlers
+  const handleCreateStrategy = (e) => {
+    e.preventDefault();
+    if (!newStrategy.name || !newStrategy.type) return;
+    
+    const newId = Math.max(...strategies.map(s => s.id), 0) + 1;
+    const strategy = { 
+        ...newStrategy, 
+        id: newId, 
+        created_at: new Date().toISOString().split('T')[0]
+    };
+
+    setStrategies(prev => [...prev, strategy]);
+    setNewStrategy({ name: '', description: '', type: 'SMA' });
+    setShowCreateForm(false);
+  };
+
+  const handleDeleteStrategy = (id) => {
+    if (window.confirm('Are you sure you want to delete this strategy?')) {
+        setStrategies(prev => prev.filter(s => s.id !== id));
+    }
+  };
+
+  return (
+    <div className="p-6 md:p-12 max-w-7xl mx-auto space-y-8">
+      <h1 className="text-4xl font-extrabold text-gray-900">Trading Strategy Library</h1>
+      <p className="text-lg text-gray-600">Manage your custom trading strategies and explore available types.</p>
+
+      <button 
+        onClick={() => setShowCreateForm(!showCreateForm)}
+        className="bg-green-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md hover:bg-green-700 transition duration-150 flex items-center"
+      >
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+        {showCreateForm ? 'Cancel Creation' : 'Create New Strategy'}
+      </button>
+
+      {showCreateForm && (
+        <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 max-w-xl">
+          <h2 className="text-2xl font-semibold mb-4">Define New Strategy</h2>
+          <form onSubmit={handleCreateStrategy} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Strategy Name</label>
+              <input
+                type="text" required
+                value={newStrategy.name}
+                onChange={(e) => setNewStrategy({...newStrategy, name: e.target.value})}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Strategy Type</label>
+              <select
+                value={newStrategy.type}
+                onChange={(e) => setNewStrategy({...newStrategy, type: e.target.value})}
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              >
+                {mockStrategyTypes.map(st => <option key={st.value} value={st.value}>{st.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Description (Optional)</label>
+              <textarea
+                value={newStrategy.description}
+                onChange={(e) => setNewStrategy({...newStrategy, description: e.target.value})}
+                rows="3"
+                className="w-full p-2 border border-gray-300 rounded-lg"
+              ></textarea>
+            </div>
+            <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition">
+              Save Strategy
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* User Strategies */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {strategies.length === 0 ? (
+          <div className="md:col-span-3 p-10 bg-white rounded-xl shadow-lg border border-gray-100 text-center">
+            <h3 className="text-2xl font-semibold text-gray-800 mb-2">No Strategies Yet</h3>
+            <p className="text-gray-500">Create your first trading strategy above to get started!</p>
+          </div>
+        ) : (
+          strategies.map((strategy) => (
+            <div key={strategy.id} className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 flex flex-col justify-between">
+              <div>
+                <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-xl font-bold text-gray-800">{strategy.name}</h3>
+                    <span className="text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">{strategy.type}</span>
+                </div>
+                <p className="text-gray-600 mb-4">{strategy.description || 'No description provided'}</p>
+              </div>
+              <div className="flex justify-between items-center border-t pt-4">
+                <div className="text-sm text-gray-500">Created: {strategy.created_at}</div>
+                <button 
+                  className="bg-red-500 text-white text-sm font-semibold py-1 px-3 rounded-lg hover:bg-red-600 transition"
+                  onClick={() => handleDeleteStrategy(strategy.id)}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Available Strategy Types */}
+      <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mt-8">
+        <h2 className="text-2xl font-semibold mb-6 border-b pb-2">Available Strategy Types</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {mockStrategyTypes.map(st => (
+            <div key={st.value} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <h4 className="text-lg font-semibold text-gray-800 mb-1">{st.label}</h4>
+              <p className="text-sm text-gray-600">{st.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// --- MAIN APP COMPONENT ---
+
+const NavLink = ({ to, children }) => {
+    const location = useLocation();
+    const isActive = location.pathname === to;
+
+    return (
+        <Link 
+            to={to} 
+            className={`px-4 py-2 rounded-lg transition duration-150 ${
+                isActive ? 'bg-blue-700 text-white shadow-lg' : 'text-blue-200 hover:bg-blue-700 hover:text-white'
+            }`}
+        >
+            {children}
+        </Link>
+    );
+};
+
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen bg-gray-100 font-sans">
+        
+        {/* Header/Navbar */}
+        <header className="bg-blue-600 shadow-md sticky top-0 z-10">
+          <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2 text-white text-2xl font-bold tracking-wider">
+              {/* Using a simple icon or text as the logo */}
+              <svg className="w-8 h-8 text-yellow-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"></path></svg>
+              <span>FinRus</span>
+            </Link>
+            
+            {/* Navigation Links */}
+            <div className="flex space-x-2 sm:space-x-4">
+              <NavLink to="/">Home</NavLink>
+              <NavLink to="/backtest">Backtest</NavLink>
+              <NavLink to="/portfolio">Portfolio</NavLink>
+              <NavLink to="/strategies">Strategies</NavLink>
+            </div>
+          </nav>
+        </header>
+
+        {/* Main Content Area */}
+        <main className="pb-12 pt-4">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/backtest" element={<BacktestPage />} />
+            <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/strategies" element={<StrategiesPage />} />
+            {/* Default to Home */}
+            <Route path="*" element={<HomePage />} />
+          </Routes>
+        </main>
+
+        {/* Footer */}
+        <footer className="bg-gray-800 text-white text-center p-4">
+            <p className="text-sm">© 2024 FinRus - Financial Backtesting & Monitoring Platform</p>
+        </footer>
+      </div>
+    </Router>
+  );
+}
+
+export default App;

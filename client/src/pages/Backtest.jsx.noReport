@@ -1,0 +1,201 @@
+import React, { useState } from 'react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import StrategyForm from '../components/strategies'; // Corrected import path
+import { backtestAPI } from '../services/api';
+
+// --- FAKE DATA (To demonstrate the UI functionality before API connection) ---
+const FAKE_BACKTEST_DATA = {
+    id: 1,
+    strategy_id: 1,
+    symbol: 'SPY',
+    start_date: '2020-01-01',
+    end_date: '2023-12-31',
+    initial_capital: 10000.00,
+    final_capital: 15500.00,
+    total_return: 0.55,
+    sharpe_ratio: 1.25,
+    max_drawdown: 0.15,
+    win_rate: 0.65,
+    total_trades: 12,
+    equity_curve: [
+        { date: '2020-01-01', equity: 10000.00 },
+        { date: '2020-12-31', equity: 11500.00 },
+        { date: '2021-12-31', equity: 13500.00 },
+        { date: '2022-12-31', equity: 12800.00 },
+        { date: '2023-12-31', equity: 15500.00 },
+    ],
+    trades: [
+        { id: 1, entryDate: '2020-03-01', exitDate: '2021-06-15', entryPrice: 250.00, exitPrice: 337.50, quantity: 10, profit: 875.00, returnPct: 35.00 },
+        { id: 2, entryDate: '2022-01-01', exitDate: '2023-10-30', entryPrice: 400.00, exitPrice: 440.00, quantity: 15, profit: 600.00, returnPct: 10.00 },
+        { id: 3, entryDate: '2023-08-01', exitDate: '2023-11-15', entryPrice: 450.00, exitPrice: 405.00, quantity: 20, profit: -900.00, returnPct: -10.00 },
+    ]
+};
+
+// Helper function for formatting currency
+const formatCurrency = (amount) => {
+    return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+};
+
+// Main Backtest Component
+const Backtest = () => {
+    const [results, setResults] = useState(null); // Use null initially
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Function to run the backtest, passed down to StrategyForm
+    const handleRunBacktest = async (formData) => {
+        setLoading(true);
+        setError(null);
+        setResults(null); // Clear previous results
+
+        try {
+            // In a real app, you would use: await backtestAPI.runBacktest(formData);
+            
+            // --- MOCK API CALL SIMULATION ---
+            console.log("Running Backtest with data:", formData);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // On success, set the mock results
+            setResults(FAKE_BACKTEST_DATA); 
+            // ---------------------------------
+
+        } catch (err) {
+            console.error('Backtest failed:', err);
+            setError(`Failed to run backtest: ${err.message || 'Server error'}`);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-900 text-gray-100 p-4 sm:p-8 flex flex-col items-center">
+            <h1 className="text-4xl font-extrabold mb-8 text-teal-400">Strategy Backtesting Engine</h1>
+            
+            {/* 1. Strategy Form */}
+            <StrategyForm onRunBacktest={handleRunBacktest} />
+            
+            {/* 2. Loading and Error Status */}
+            {loading && (
+                <div className="text-xl text-teal-300 mb-6 p-4 bg-gray-800 rounded-xl max-w-xl w-full text-center border border-teal-500/50">
+                    <span className="animate-spin inline-block mr-3">⚙️</span> Calculating Results...
+                </div>
+            )}
+            
+            {error && (
+                <div className="bg-red-900 p-4 rounded-xl mb-8 text-red-300 border border-red-700 max-w-xl w-full text-center">
+                    Error: {error}
+                </div>
+            )}
+            
+            {/* 3. Backtest Results Dashboard */}
+            <div className="backtest-results-dashboard w-full max-w-7xl">
+                {results ? (
+                    <div className="space-y-8">
+                        <h2 className="text-3xl font-bold text-white border-b border-gray-700 pb-4">
+                            Performance Report for {results.symbol}
+                        </h2>
+                        
+                        {/* 3.1 Key Metrics Summary */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            
+                            <MetricCard title="Total Return" value={`${(results.total_return * 100).toFixed(2)}%`} isPositive={results.total_return >= 0} />
+                            <MetricCard title="Final Capital" value={formatCurrency(results.final_capital)} isPositive={results.final_capital > results.initial_capital} />
+                            <MetricCard title="Sharpe Ratio" value={results.sharpe_ratio.toFixed(2)} isPositive={results.sharpe_ratio > 1} />
+                            <MetricCard title="Max Drawdown" value={`${(results.max_drawdown * 100).toFixed(2)}%`} isPositive={results.max_drawdown <= 0.15} />
+                        </div>
+
+                        {/* 3.2 Equity Curve Chart */}
+                        <div className="bg-gray-800 p-6 rounded-xl shadow-xl border border-teal-500/50">
+                            <h3 className="text-2xl font-semibold mb-4 text-white">Equity Curve</h3>
+                            <ResponsiveContainer width="100%" height={400}>
+                                <LineChart data={results.equity_curve} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                                    <XAxis dataKey="date" stroke="#9CA3AF" />
+                                    <YAxis 
+                                        stroke="#9CA3AF" 
+                                        tickFormatter={(value) => formatCurrency(value)}
+                                        domain={['auto', 'auto']}
+                                    />
+                                    <Tooltip 
+                                        contentStyle={{ backgroundColor: '#1F2937', border: 'none', borderRadius: '8px' }} 
+                                        labelStyle={{ color: '#E5E7EB', fontWeight: 'bold' }}
+                                        formatter={(value) => [formatCurrency(value), 'Equity']}
+                                    />
+                                    <Legend wrapperStyle={{ paddingTop: '10px' }}/>
+                                    <Line 
+                                        type="monotone" 
+                                        dataKey="equity" 
+                                        stroke="#00C49F" 
+                                        activeDot={{ r: 6 }} 
+                                        name="Portfolio Equity"
+                                        strokeWidth={3}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* 3.3 Trade History Table */}
+                        <div className="bg-gray-800 p-6 rounded-xl shadow-xl overflow-x-auto border border-gray-700">
+                            <h3 className="text-2xl font-semibold mb-4 text-white">Trade History ({results.trades.length} Trades)</h3>
+                            <table className="min-w-full divide-y divide-gray-700">
+                                <thead className="bg-gray-700">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Entry Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Exit Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Entry Price</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Exit Price</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Quantity</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Profit/Loss</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Return %</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {results.trades.map((trade) => (
+                                        <tr key={trade.id} className="hover:bg-gray-700/50 transition-colors">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{trade.entryDate}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{trade.exitDate}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatCurrency(trade.entryPrice)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatCurrency(trade.exitPrice)}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm">{trade.quantity}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${trade.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                {formatCurrency(trade.profit)}
+                                            </td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${trade.returnPct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                {trade.returnPct.toFixed(2)}%
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center p-10 bg-gray-800 rounded-xl shadow-xl border border-gray-700 max-w-xl mx-auto mt-10">
+                        <p className="text-xl text-gray-400">Define your strategy parameters above and click "Run Backtest" to view the performance dashboard.</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// Simple reusable metric card component
+const MetricCard = ({ title, value, isPositive }) => {
+    const colorClass = isPositive ? 'text-green-400' : 'text-red-400';
+    
+    // Custom color logic for drawdown (lower is generally better)
+    let displayColor = colorClass;
+    if (title === "Max Drawdown") {
+        const drawdownValue = parseFloat(value.replace('%', '')) / 100;
+        displayColor = drawdownValue < 0.15 ? 'text-green-400' : (drawdownValue < 0.30 ? 'text-yellow-400' : 'text-red-400');
+    }
+
+    return (
+        <div className="bg-gray-800 p-5 rounded-xl shadow-lg border border-gray-700 hover:border-teal-500 transition-colors">
+            <p className="text-sm font-medium text-gray-400 uppercase tracking-wider">{title}</p>
+            <p className={`text-3xl font-extrabold mt-1 ${displayColor}`}>{value}</p>
+        </div>
+    );
+};
+
+export default Backtest;

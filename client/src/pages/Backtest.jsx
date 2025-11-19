@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import "./Backtest.css"; // Ensure this link is correct
 import {
   LineChart,
   Line,
@@ -10,8 +12,9 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-// --- MOCK API AND HELPERS (Self-Contained for Demonstration) ---
+// --- MOCK DATA & HELPERS (For self-contained example) ---
 
+// In a real application, this would come from the api.js file
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -19,7 +22,7 @@ const formatCurrency = (amount) => {
     }).format(amount);
 };
 
-// Mock data to simulate a successful backtest result
+// Mock backtest results data structure for demonstration
 const mockBacktestResult = {
   success: true,
   strategyName: 'SMA Crossover (20/50)',
@@ -36,429 +39,400 @@ const mockBacktestResult = {
   trades: [
     { entryDate: '2023-03-01', exitDate: '2023-04-15', entryPrice: 150.00, exitPrice: 165.00, quantity: 10, profit: 150.00, returnPct: 10.00 },
     { entryDate: '2023-05-10', exitDate: '2023-06-20', entryPrice: 170.00, exitPrice: 160.00, quantity: 5, profit: -50.00, returnPct: -5.88 },
-    { entryDate: '2023-08-01', exitDate: '2023-10-30', entryPrice: 175.00, exitPrice: 200.00, quantity: 12, profit: 300.00, returnPct: 14.28 },
+    { entryDate: '2023-08-01', exitDate: '2023-09-10', entryPrice: 175.00, exitPrice: 190.00, quantity: 8, profit: 120.00, returnPct: 8.57 },
+    { entryDate: '2023-10-20', exitDate: '2023-11-25', entryPrice: 185.00, exitPrice: 170.00, quantity: 12, profit: -180.00, returnPct: -8.11 },
   ],
   equityCurve: [
-    { date: '2023-01-01', value: 10000.00 },
-    { date: '2023-03-01', value: 10000.00 },
-    { date: '2023-04-15', value: 10150.00 },
-    { date: '2023-05-10', value: 10150.00 },
-    { date: '2023-06-20', value: 10100.00 },
-    { date: '2023-08-01', value: 10100.00 },
-    { date: '2023-10-30', value: 10400.00 },
-    { date: '2023-12-31', value: 12500.55 },
-  ],
+    { date: '2023-01-01', equity: 10000.00 },
+    { date: '2023-03-01', equity: 10000.00 },
+    { date: '2023-04-15', equity: 10150.00 },
+    { date: '2023-05-10', equity: 10150.00 },
+    { date: '2023-06-20', equity: 10100.00 },
+    { date: '2023-08-01', equity: 10100.00 },
+    { date: '2023-09-10', equity: 10220.00 },
+    { date: '2023-10-20', equity: 10220.00 },
+    { date: '2023-11-25', equity: 10040.00 },
+    { date: '2023-12-31', equity: 12500.55 },
+  ]
 };
 
-const backtestAPI = {
-  runBacktest: async (data) => {
-    console.log('Mock API: Running backtest with data:', data);
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay
-    return { 
-        ...mockBacktestResult, 
-        strategyName: data.strategyName || mockBacktestResult.strategyName,
-        symbol: data.symbol || mockBacktestResult.symbol,
+const strategyTypes = [
+  { value: 'SMA', label: 'Simple Moving Average', description: 'Crossover strategy using short and long period SMAs.'
+},
+  { value: 'RSI', label: 'Relative Strength Index', description: 'Trades based on overbought and oversold conditions.' },
+];
+
+const BacktestForm = ({ onBacktest, isLoading }) => {
+  const { register, handleSubmit, watch } = useForm({
+    defaultValues: {
+      strategyType: 'SMA',
+      symbol: 'AAPL',
+      startDate: '2023-01-01',
+      endDate: '2023-12-31',
+      initialCapital: 10000,
+      shortPeriod: 20,
+      longPeriod: 50,
+      rsiPeriod: 14,
+      oversold: 30,
+      overbought: 70
+    }
+  });
+  const selectedStrategy = watch('strategyType');
+
+  const onSubmit = (data) => {
+    // Clean up parameters based on selected strategy
+    const params = {
+      strategyType: data.strategyType,
+      symbol: data.symbol,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      initialCapital: parseFloat(data.initialCapital),
+      parameters: {}
     };
-  },
-  getResults: async (limit) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return { results: [{ id: 1, name: 'Latest SMA', date: '2024-11-17', return: '25.01%' }] };
-  },
+    if (data.strategyType === 'SMA') {
+      params.parameters.shortPeriod = parseInt(data.shortPeriod);
+      params.parameters.longPeriod = parseInt(data.longPeriod);
+    } else if (data.strategyType === 'RSI') {
+      params.parameters.rsiPeriod = parseInt(data.rsiPeriod);
+      params.parameters.oversold = parseInt(data.oversold);
+      params.parameters.overbought = parseInt(data.overbought);
+    }
+
+    // In a real app: await backtestAPI.runBacktest(params)
+    // For this example, we return mock data after a small delay
+    setTimeout(() => {
+      onBacktest(mockBacktestResult);
+    }, 1500);
+  };
+
+  return (
+    <div className="form-card">
+      <h2 className="form-title">Strategy Parameters</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="form-body">
+        <div className="input-group-grid">
+          <div className="form-field">
+            <label className="form-label">Strategy Type</label>
+            <select
+              {...register("strategyType")}
+              className="form-input"
+            >
+              {strategyTypes.map(s => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="form-field">
+            <label className="form-label">Symbol (e.g., AAPL)</label>
+            <input
+              type="text"
+              {...register("symbol", { required: true })}
+              className="form-input uppercase"
+            />
+          </div>
+          <div className="form-field">
+            <label className="form-label">Initial Capital ($)</label>
+            <input
+              type="number"
+              step="0.01"
+              min="100"
+              {...register("initialCapital", { valueAsNumber: true, required: true })}
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        <div className="input-group-row">
+          <div className="form-field">
+            <label className="form-label">Start Date</label>
+            <input
+              type="date"
+              {...register("startDate", { required: true })}
+              className="form-input"
+            />
+          </div>
+          <div className="form-field">
+            <label className="form-label">End Date</label>
+            <input
+              type="date"
+              {...register("endDate", { required: true })}
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        <div className="strategy-params-section">
+          <h3 className="params-title">Strategy Specific Parameters</h3>
+          <div className="input-group-row">
+            {selectedStrategy === 'SMA' && (
+              <>
+                <div className="form-field">
+                  <label className="form-label">Short Period (Days)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    {...register("shortPeriod", { valueAsNumber: true, required: true })}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">Long Period (Days)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    {...register("longPeriod", { valueAsNumber: true, required: true })}
+                    className="form-input"
+                  />
+                </div>
+              </>
+            )}
+
+            {selectedStrategy === 'RSI' && (
+              <>
+                <div className="form-field">
+                  <label className="form-label">RSI Period</label>
+                  <input
+                    type="number"
+                    min="1"
+                    {...register("rsiPeriod", { valueAsNumber: true, required: true })}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">Oversold Threshold</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    {...register("oversold", { valueAsNumber: true, required: true })}
+                    className="form-input"
+                  />
+                </div>
+                <div className="form-field">
+                  <label className="form-label">Overbought Threshold</label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    {...register("overbought", { valueAsNumber: true, required: true })}
+                    className="form-input"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`submit-btn ${isLoading ? 'submit-btn-disabled' : ''}`}
+        >
+          {isLoading ? 'Running Backtest...' : 'Run Backtest'}
+        </button>
+      </form>
+    </div>
+  );
 };
 
-// --- END MOCK API AND HELPERS ---
-
-// Component for the historical backtest runs list
-const HistoryList = ({ history }) => (
-    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Backtests</h3>
-        <ul className="space-y-3">
-            {history.length > 0 ? (
-                history.map((item, index) => (
-                    <li key={index} className="flex justify-between items-center text-sm p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-150">
-                        <span className="font-medium text-gray-700">{item.name}</span>
-                        <div className="flex items-center space-x-3">
-                            <span className="text-gray-500">{item.date}</span>
-                            <span className={`font-bold ${parseFloat(item.return) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {item.return}
-                            </span>
-                        </div>
-                    </li>
-                ))
-            ) : (
-                <li className="text-center text-gray-500 py-4">No history found. Run a backtest!</li>
-            )}
-        </ul>
-    </div>
-);
-
+// --- Backtest Page Component ---
 
 const Backtest = () => {
-  const [formData, setFormData] = useState({
-    strategyType: 'SMA',
-    symbol: 'AAPL',
-    startDate: '2023-01-01',
-    endDate: '2023-12-31',
-    initialCapital: 10000,
-    shortPeriod: 20,
-    longPeriod: 50,
-    rsiPeriod: 14,
-    oversold: 30,
-    overbought: 70
-  });
-
+  const [backtestResults, setBacktestResults] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
-  const [history, setHistory] = useState([
-      { id: 1, name: 'Tech Momentum', date: '2024-11-17', return: '25.01%' },
-      { id: 2, name: 'Value Trap Test', date: '2024-11-10', return: '-5.22%' },
-  ]); // Using the mock history immediately
 
-  const loadHistory = async () => {
-    try {
-      // In a real app, this would fetch from an API
-      const data = await backtestAPI.getResults(10); 
-      setHistory(data.results || []);
-    } catch (err) {
-      console.error('Error loading history:', err);
-    }
-  };
-
-  useEffect(() => {
-    // loadHistory(); // Skipping actual API call for history to keep it fast
-  }, []);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleBacktest = (results) => {
     setLoading(true);
     setError(null);
-    setResults(null);
-
-    try {
-      const data = await backtestAPI.runBacktest(formData);
-      if (data.success) {
-        setResults(data);
-        // Pretend to update history
-        setHistory(prev => [
-            { id: Date.now(), name: data.strategyName, date: new Date().toLocaleDateString(), return: `${data.totalReturn.toFixed(2)}%` },
-            ...prev
-        ].slice(0, 10));
-
-      } else {
-        setError(data.error || 'Backtest failed due to an unknown error.');
-      }
-    } catch (err) {
-      setError('A connection error occurred. Please check the console for details.');
-      console.error('Backtest Submission Error:', err);
-    } finally {
+    // Simulate API call delay before setting results
+    setTimeout(() => {
+      setBacktestResults(results);
       setLoading(false);
-    }
+    }, 1500);
   };
 
-  const renderStrategyInputs = () => {
-    switch (formData.strategyType) {
-      case 'SMA':
-        return (
-          <>
-            <div className="flex-1 min-w-[150px]">
-              <label htmlFor="shortPeriod" className="block text-sm font-medium text-gray-700 mb-1">Short SMA Period</label>
-              <input
-                type="number"
-                id="shortPeriod"
-                name="shortPeriod"
-                value={formData.shortPeriod}
-                onChange={handleInputChange}
-                min="1"
-                required
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-              />
-            </div>
-            <div className="flex-1 min-w-[150px]">
-              <label htmlFor="longPeriod" className="block text-sm font-medium text-gray-700 mb-1">Long SMA Period</label>
-              <input
-                type="number"
-                id="longPeriod"
-                name="longPeriod"
-                value={formData.longPeriod}
-                onChange={handleInputChange}
-                min="1"
-                required
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-              />
-            </div>
-          </>
-        );
-      case 'RSI':
-        return (
-          <>
-            <div className="flex-1 min-w-[150px]">
-              <label htmlFor="rsiPeriod" className="block text-sm font-medium text-gray-700 mb-1">RSI Period</label>
-              <input
-                type="number"
-                id="rsiPeriod"
-                name="rsiPeriod"
-                value={formData.rsiPeriod}
-                onChange={handleInputChange}
-                min="1"
-                required
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-              />
-            </div>
-            <div className="flex-1 min-w-[150px]">
-              <label htmlFor="oversold" className="block text-sm font-medium text-gray-700 mb-1">Oversold Threshold</label>
-              <input
-                type="number"
-                id="oversold"
-                name="oversold"
-                value={formData.oversold}
-                onChange={handleInputChange}
-                min="0" max="100"
-                required
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-              />
-            </div>
-            <div className="flex-1 min-w-[150px]">
-              <label htmlFor="overbought" className="block text-sm font-medium text-gray-700 mb-1">Overbought Threshold</label>
-              <input
-                type="number"
-                id="overbought"
-                name="overbought"
-                value={formData.overbought}
-                onChange={handleInputChange}
-                min="0" max="100"
-                required
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-              />
-            </div>
-          </>
-        );
-      default:
-        return <p className="text-gray-500">Select a strategy type.</p>;
-    }
-  };
+  const MetricCard = ({ title, value, unit = '', color = 'text-gray-900', icon, isCurrency = false }) => {
+    // Determine color class for positive/negative returns
+    const valueColor = useMemo(() => {
+      if (!value) return color;
+      const numericValue = parseFloat(value);
 
-  const MetricCard = ({ title, value, isPositive = true, isCurrency = false }) => {
-    const valueClass = isPositive ? 'text-green-600' : 'text-red-600';
-    const displayValue = isCurrency ? formatCurrency(value) : `${value.toFixed(2)}${isPositive ? '%' : ''}`;
+      if (title === 'Total Return' || title === 'Sharpe Ratio' || title === 'Win Rate') {
+        return numericValue >= 0 ? 'text-green' : 'text-red';
+      }
+
+      if (title === 'Max Drawdown') {
+        // Drawdown is usually negative, smaller absolute value is better (or less negative)
+        // Drawdown values are passed as negative percentages (e.g., -8.23)
+        if (numericValue > -5.0) return 'text-green'; // Excellent drawdown
+        if (numericValue > -15.0) return 'text-yellow'; // Acceptable
+        return 'text-red'; // High drawdown
+      }
+      
+      return color;
+    }, [value, title, color]);
+
+    const formattedValue = isCurrency ?
+      formatCurrency(value) : value.toFixed(unit === '%' ? 2 : 4);
 
     return (
-      <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200">
-        <p className="text-sm font-medium text-gray-500">{title}</p>
-        <p className={`text-2xl font-bold mt-1 ${valueClass}`}>
-          {displayValue}
-        </p>
+      <div className="metric-card">
+        <div className={`metric-icon ${valueColor}`}>{icon}</div>
+        <div>
+          <p className="metric-label">{title}</p>
+          <p className={`metric-value ${valueColor}`}>
+            {formattedValue}
+            <span className="metric-unit">{unit}</span>
+          </p>
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="space-y-8 p-4">
-      <h1 className="text-4xl font-extrabold text-gray-900 border-b pb-2 mb-6">Strategy Backtesting</h1>
+    <div className="page-container">
+      <div className="content-wrapper">
+        <h1 className="page-title">Backtest Trading Strategies</h1>
+        <hr className="title-separator" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* === Backtest Form (Column 1) === */}
-        <div className="lg:col-span-1">
-          <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-2xl border-t-4 border-yellow-500 space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Run New Backtest</h2>
+        <BacktestForm onBacktest={handleBacktest} isLoading={loading} />
 
-            {/* Strategy Type */}
-            <div>
-              <label htmlFor="strategyType" className="block text-sm font-medium text-gray-700 mb-1">Strategy Type</label>
-              <select
-                id="strategyType"
-                name="strategyType"
-                value={formData.strategyType}
-                onChange={handleInputChange}
-                className="w-full p-2 border border-gray-300 rounded-lg bg-white focus:ring-yellow-500 focus:border-yellow-500"
-              >
-                <option value="SMA">SMA Crossover</option>
-                <option value="RSI">RSI Indicator</option>
-                {/* Add other strategy types here */}
-              </select>
-            </div>
-
-            {/* Strategy Parameters */}
-            <div className="flex flex-wrap gap-4">
-              <div className="flex-1 min-w-[150px]">
-                <label htmlFor="symbol" className="block text-sm font-medium text-gray-700 mb-1">Symbol (e.g., AAPL)</label>
-                <input
-                  type="text"
-                  id="symbol"
-                  name="symbol"
-                  value={formData.symbol}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500 uppercase"
-                />
-              </div>
-              <div className="flex-1 min-w-[150px]">
-                <label htmlFor="initialCapital" className="block text-sm font-medium text-gray-700 mb-1">Initial Capital ($)</label>
-                <input
-                  type="number"
-                  id="initialCapital"
-                  name="initialCapital"
-                  value={formData.initialCapital}
-                  onChange={handleInputChange}
-                  min="1000"
-                  step="100"
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4">
-              <div className="flex-1 min-w-[150px]">
-                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-                />
-              </div>
-              <div className="flex-1 min-w-[150px]">
-                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                <input
-                  type="date"
-                  id="endDate"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-yellow-500 focus:border-yellow-500"
-                />
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-4 pt-2">
-                {renderStrategyInputs()}
-            </div>
-
-            {error && (
-              <div className="p-3 text-sm font-medium text-red-700 bg-red-100 rounded-lg mt-4" role="alert">
-                Error: {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full py-3 mt-4 text-white font-semibold rounded-lg transition duration-300 shadow-md ${
-                loading ? 'bg-yellow-400 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800'
-              }`}
-            >
-              {loading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                  Running Backtest...
-                </span>
-              ) : 'Run Backtest'}
-            </button>
-          </form>
-          
-          <div className="mt-8">
-              <HistoryList history={history} />
+        {loading && (
+          <div className="loading-message-card">
+            <svg className="spinner-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Analyzing market data and calculating results...
           </div>
-        </div>
+        )}
 
-        {/* === Backtest Results (Column 2/3) === */}
-        <div className="lg:col-span-2">
-          {results ? (
-            <div className="space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-2xl border-t-4 border-green-500">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                    ✅ Results for {results.strategyName} on {results.symbol}
-                </h2>
-                <p className="text-gray-600 text-sm mb-4">
-                    Period: {results.startDate} to {results.endDate} | Initial Capital: {formatCurrency(results.initialCapital)}
-                </p>
+        {backtestResults && (
+          <div className="results-report">
+            <h2 className="report-title">Backtest Report: {backtestResults.strategyName} on {backtestResults.symbol}</h2>
 
-                {/* Performance Metrics Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <MetricCard title="Total Return" value={results.totalReturn} isPositive={results.totalReturn >= 0} />
-                  <MetricCard title="Final Capital" value={results.finalCapital} isPositive={true} isCurrency={true} />
-                  <MetricCard title="Sharpe Ratio" value={results.sharpeRatio} isPositive={results.sharpeRatio >= 1} />
-                  <MetricCard title="Max Drawdown" value={results.maxDrawdown} isPositive={results.maxDrawdown >= 0} />
-                  <MetricCard title="Win Rate" value={results.winRate} isPositive={results.winRate >= 50} />
-                  <MetricCard title="Total Trades" value={results.totalTrades} isPositive={true} isCurrency={false} />
-                </div>
+            {/* Metrics Grid */}
+            <div className="metrics-grid">
+              <MetricCard
+                title="Final Capital"
+                value={backtestResults.finalCapital}
+                icon={'💰'}
+                isCurrency={true}
+              />
+              <MetricCard
+                title="Total Return"
+                value={backtestResults.totalReturn}
+                unit="%"
+                icon={backtestResults.totalReturn >= 0 ? '📈' : '📉'}
+              />
+              <MetricCard
+                title="Sharpe Ratio"
+                value={backtestResults.sharpeRatio}
+                icon={'📊'}
+              />
+              <MetricCard
+                title="Max Drawdown"
+                value={backtestResults.maxDrawdown}
+                unit="%"
+                icon={'🔻'}
+              />
+              <MetricCard
+                title="Win Rate"
+                value={backtestResults.winRate}
+                unit="%"
+                icon={'🎯'}
+              />
+              <MetricCard
+                title="Total Trades"
+                value={backtestResults.totalTrades}
+                unit=""
+                icon={'#️⃣'}
+                isCurrency={false}
+              />
+              <MetricCard
+                title="Initial Capital"
+                value={backtestResults.initialCapital}
+                icon={'💵'}
+                isCurrency={true}
+              />
+              <MetricCard
+                title="Period"
+                value={0} // Mock value, in a real app this would be duration
+                unit="Days"
+                icon={'📅'}
+                isCurrency={false}
+              />
+            </div>
 
-                {/* Equity Curve Chart */}
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Equity Curve</h3>
-                <div className="bg-gray-50 p-4 rounded-lg h-80">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={results.equityCurve} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                      <XAxis dataKey="date" stroke="#6b7280" tickFormatter={(date) => date.substring(5, 10)} />
-                      <YAxis stroke="#6b7280" tickFormatter={(value) => formatCurrency(value)} domain={['auto', 'auto']} />
-                      <Tooltip formatter={(value) => [formatCurrency(value), 'Portfolio Value']} labelFormatter={(label) => `Date: ${label}`} />
-                      <Legend />
-                      <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} name="Portfolio Value" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
+            {/* Equity Curve Chart */}
+            <div className="card-section">
+              <h3 className="card-title">Equity Curve</h3>
+              <div style={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={backtestResults.equityCurve}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <XAxis dataKey="date" stroke="#6b7280" />
+                    <YAxis
+                      domain={['auto', 'auto']}
+                      tickFormatter={formatCurrency}
+                      stroke="#6b7280"
+                    />
+                    <Tooltip
+                      formatter={(value) => formatCurrency(value)}
+                      labelFormatter={(label) => `Date: ${label}`}
+                      contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="equity"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={false}
+                      name="Portfolio Value"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
+            </div>
 
-              {/* Trade Log Table */}
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Trade Log ({results.trades.length} Trades)</h3>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-xl">Entry Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exit Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entry Price</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exit Price</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Profit/Loss</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-xl">Return %</th>
+            {/* Trades Table */}
+            <div className="card-section">
+              <h3 className="card-title">Detailed Trades ({backtestResults.totalTrades})</h3>
+              <div className="table-container">
+                <table className="trades-table">
+                  <thead className="table-head">
+                    <tr>
+                      <th className="table-header-cell">Entry Date</th>
+                      <th className="table-header-cell">Exit Date</th>
+                      <th className="table-header-cell">Entry Price</th>
+                      <th className="table-header-cell">Exit Price</th>
+                      <th className="table-header-cell">Quantity</th>
+                      <th className="table-header-cell">P/L</th>
+                      <th className="table-header-cell">Return %</th>
+                    </tr>
+                  </thead>
+                  <tbody className="table-body">
+                    {backtestResults.trades.map((trade, index) => (
+                      <tr key={index} className="table-row-hover">
+                        <td className="table-cell">{trade.entryDate}</td>
+                        <td className="table-cell">{trade.exitDate}</td>
+                        <td className="table-cell">{formatCurrency(trade.entryPrice)}</td>
+                        <td className="table-cell">{formatCurrency(trade.exitPrice)}</td>
+                        <td className="table-cell">{trade.quantity}</td>
+                        <td className={`table-cell table-cell-pl ${trade.profit >= 0 ? 'text-green' : 'text-red'}`}>
+                          {formatCurrency(trade.profit)}
+                        </td>
+                        <td className={`table-cell table-cell-return ${trade.returnPct >= 0 ? 'text-green' : 'text-red'}`}>
+                          {trade.returnPct.toFixed(2)}%
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {results.trades.map((trade, index) => (
-                        <tr key={index} className="hover:bg-yellow-50 transition duration-150">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{trade.entryDate}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{trade.exitDate}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(trade.entryPrice)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatCurrency(trade.exitPrice)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{trade.quantity}</td>
-                          <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold text-right ${trade.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {formatCurrency(trade.profit)}
-                          </td>
-                          <td className={`px-6 py-4 whitespace-nowrap text-sm font-semibold text-right ${trade.returnPct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {trade.returnPct.toFixed(2)}%
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full min-h-[500px] bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-              <svg className="w-16 h-16 text-yellow-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19V6l12-3v14m-6-14v14m-6-8h6"></path></svg>
-              <h2 className="text-2xl font-semibold text-gray-800 mb-2">No Backtest Results</h2>
-              <p className="text-gray-600 text-center max-w-md">
-                Enter your strategy parameters on the left and click **Run Backtest** to analyze its historical performance and view your Equity Curve.
-              </p>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
