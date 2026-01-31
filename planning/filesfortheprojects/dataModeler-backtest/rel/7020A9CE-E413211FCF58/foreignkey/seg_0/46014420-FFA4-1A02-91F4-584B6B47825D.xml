@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="46014420-FFA4-1A02-91F4-584B6B47825D" containerWithKeyObject="2877E029-D018-87A4-9C85-48C4F592547C" localFKIndex="403F213F-C366-B1C0-E025-61FCC0908033" name="backtest_results_strategies_FK">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>014C558A-9CE1-926E-908B-C2392BE42463</importedID>
+<referredTableLongName>strategies</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>F52A61BB-B541-753B-8327-756C92BAD61E</referredTableID>
+<keyObject>F68F2824-D41E-6A4E-3DB2-3F2CD45FED1A</keyObject>
+<referredKeyID>F68F2824-D41E-6A4E-3DB2-3F2CD45FED1A</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

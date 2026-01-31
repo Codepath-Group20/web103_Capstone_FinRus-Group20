@@ -1,0 +1,153 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="94C7F2EB-3287-D5ED-5E3C-3B05401A2C8D" name="historical prices">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>1A16E434-2AFB-4D88-2BDA-C3B0D9A7A4CA</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id" id="A15D41B1-0D83-779E-9ABE-C08520E1FB99">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>B803ABBE-6C5E-0B99-5A98-C7B49B377F8E</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>7A46DD54-66FB-4730-75B5-2B74B50ABE3D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="symbol" id="5748120C-A47F-428E-C6CE-4CB421796D9B">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>5969F775-4BB0-9F5A-6E24-90CEDE0DC362</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>FD222237-A041-0A93-84FC-61C10042D1CB</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="date" id="D335C7C3-E56B-F6D0-3B1A-03244EFA68DA">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>9922F1D4-FBB0-7B81-072D-6C9711E50C13</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>B05B60C8-CCA1-838D-4CCB-A85489297AC3</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="open" id="9EC47615-ECC3-43F8-B047-AB4E72DAF082">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>575928DD-0928-464E-5FF3-1D3C175A0EA6</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="high" id="EB67AD2F-7910-2B9D-F959-499EAB6FD110">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>1B85DCB4-0ED4-0E08-D8D9-357A0D150CA5</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="low" id="2F4024AA-D780-0702-8996-13981F061610">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>2BEF65D0-F9EB-9EDC-0CCC-A5A4F9C54E9E</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="close" id="261A1039-1368-64C8-1560-4755696866C9">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>9F5C9766-143E-7C28-77F4-BB7CCB909CEC</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="volume" id="B8437A03-3502-602A-5AAF-FC4FE6A75DFC">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>C736520B-3F42-105E-DB17-A70B5EC5CE0F</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>455E05EB-F792-9C07-DE2C-DBFB9B587F31</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="10926D51-C6C5-2DC6-8571-B40A18B98729" name="historical prices PK">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>14F0CF1C-B5AF-5A3B-1C7A-ACB83ED12688</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>A15D41B1-0D83-779E-9ABE-C08520E1FB99</attributeRef>
+</usedAttributes>
+</identifier>
+<identifier id="0D58F866-5F3E-ACA0-6E6C-D1530F8BBD39" name="uk historical prices">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>98518991-D8C1-CEFE-9D9A-ABFA19B57454</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<usedAttributes>
+<attributeRef>5748120C-A47F-428E-C6CE-4CB421796D9B</attributeRef>
+<attributeRef>D335C7C3-E56B-F6D0-3B1A-03244EFA68DA</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

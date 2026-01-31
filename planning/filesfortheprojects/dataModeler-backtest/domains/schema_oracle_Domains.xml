@@ -1,0 +1,118 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<DomainFile class="oracle.dbtools.crest.model.design.DomainFileWrapper" fileName="schema_oracle_Domains">
+<domains>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="CLOB_0_0_0" id="1903A228-9DB4-1172-009E-FCFB5DECECAC">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT028</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="NUMERIC_20_0_0" id="455E05EB-F792-9C07-DE2C-DBFB9B587F31">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>20</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<dataTypeSize>0</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT019</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="VARCHAR_0_0_255" id="5D6FB832-822B-5288-AE4F-5608F3310896">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>0</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<dataTypeSize>255</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT024</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="Timestamp_6_0_0" id="69F06C27-74F7-D0B7-31F0-B3D408D30107">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>6</dataTypePrecision>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT015</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="NUMERIC_10_0_0" id="7A46DD54-66FB-4730-75B5-2B74B50ABE3D">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<dataTypeSize>0</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT019</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="NUMERIC_10_4_0" id="8E008D6E-32E1-00E7-BF4F-B0D0395E45D6">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>4</dataTypeScale>
+<dataTypeSize>0</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT019</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="NUMERIC_15_2_0" id="9AF82216-2346-AFC6-7292-DB4D3EE8B07D">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>15</dataTypePrecision>
+<dataTypeScale>2</dataTypeScale>
+<dataTypeSize>0</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT019</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="Date_0_0_0" id="B05B60C8-CCA1-838D-4CCB-A85489297AC3">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT007</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="NUMERIC_5_2_0" id="CD4CA0C0-33B0-9180-07F7-B21893888BCF">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>2</dataTypeScale>
+<dataTypeSize>0</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT019</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="VARCHAR_0_0_50" id="ED057640-3DF7-321E-3721-39A45D3ADCD4">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>0</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<dataTypeSize>50</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT024</logicalDatatype>
+</Domain>
+<Domain class="oracle.dbtools.crest.model.design.Domain" name="VARCHAR_0_0_10" id="FD222237-A041-0A93-84FC-61C10042D1CB">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<avTSortOrder>0</avTSortOrder>
+<dataTypePrecision>0</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<dataTypeSize>10</dataTypeSize>
+<fileName>schema_oracle_Domains</fileName>
+<logicalDatatype>LOGDT024</logicalDatatype>
+</Domain>
+</domains>
+</DomainFile>

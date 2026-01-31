@@ -1,0 +1,15 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<relationalModel class="oracle.dbtools.crest.model.design.relational.RelationalDesign" name="Relational_1" id="7020A9CE-2981-2A6B-E618-E413211FCF58" mainViewID="22D065F5-4801-4A02-B994-F37B36270EC6">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:21:33 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+<selectedRDBMSSite>01F6E6D1-21D0-CFBD-ABDD-3988D1813575</selectedRDBMSSite>
+<importDDLFileStamps>
+<importDDLFileStamp class="oracle.dbtools.crest.imports.DDLFileStamp">
+<fileName>schema_oracle.sql</fileName>
+<pathName>/home/leo/Classes/fall_2025/CodePath-Web103/web103_Capstone_FinRus-Group20/planning/filesfortheprojects</pathName>
+<dbType>17</dbType>
+</importDDLFileStamp>
+</importDDLFileStamps>
+</relationalModel>

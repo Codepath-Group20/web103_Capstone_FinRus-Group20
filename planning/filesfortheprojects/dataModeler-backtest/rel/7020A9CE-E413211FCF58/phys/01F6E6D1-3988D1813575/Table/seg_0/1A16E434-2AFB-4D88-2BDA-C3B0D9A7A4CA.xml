@@ -1,0 +1,79 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev20c class="oracle.dbtools.crest.model.design.storage.oracle.v20c.TableProxyOraclev20c" name="historical_prices" directorySegmentName="seg_0" id="1A16E434-2AFB-4D88-2BDA-C3B0D9A7A4CA">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="high" id="1B85DCB4-0ED4-0E08-D8D9-357A0D150CA5">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="low" id="2BEF65D0-F9EB-9EDC-0CCC-A5A4F9C54E9E">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="open" id="575928DD-0928-464E-5FF3-1D3C175A0EA6">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="symbol" id="5969F775-4BB0-9F5A-6E24-90CEDE0DC362">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="date" id="9922F1D4-FBB0-7B81-072D-6C9711E50C13">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="close" id="9F5C9766-143E-7C28-77F4-BB7CCB909CEC">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="id" id="B803ABBE-6C5E-0B99-5A98-C7B49B377F8E">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="volume" id="C736520B-3F42-105E-DB17-A70B5EC5CE0F">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="idx_historical_prices_symbol_date" id="83932B31-96FC-F756-2246-8C743C4E0ADB">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<logging></logging>
+</IndexProxy>
+</indexProxies>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="historical_prices_PK" id="14F0CF1C-B5AF-5A3B-1C7A-ACB83ED12688">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+<uniqueKeys>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="uk_historical_prices" id="98518991-D8C1-CEFE-9D9A-ABFA19B57454">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<existingIndex>83932B31-96FC-F756-2246-8C743C4E0ADB</existingIndex>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</UniqueKey>
+</uniqueKeys>
+</TableProxyOraclev20c>

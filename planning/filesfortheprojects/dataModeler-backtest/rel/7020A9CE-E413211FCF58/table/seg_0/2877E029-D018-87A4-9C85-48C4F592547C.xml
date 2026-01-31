@@ -1,0 +1,240 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="2877E029-D018-87A4-9C85-48C4F592547C" name="backtest_results">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>954C060A-2110-F5A2-00D8-6709D045A394</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="2A21FE60-8D7A-B3A8-9780-34A18197DAEC">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>876FC917-D451-BA93-7D78-684324B5A85F</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>7A46DD54-66FB-4730-75B5-2B74B50ABE3D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="strategy_id" id="76561DF7-05FF-3D50-B94A-B104337ED5D6">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>6C30C5A7-7105-6AD4-9C6C-94B641631F7F</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>7A46DD54-66FB-4730-75B5-2B74B50ABE3D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="46014420-FFA4-1A02-91F4-584B6B47825D" referredColumn="C3D475B9-5D94-9FC8-B5A9-456864818083"/>
+</associations>
+</Column>
+<Column name="symbol" id="93500D79-9301-7A98-574D-A250FDA0A618">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>C6283DBF-AC6D-8337-F687-13E5B2296252</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>FD222237-A041-0A93-84FC-61C10042D1CB</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="start_date" id="0689359D-B678-4FF7-1728-9C674646E838">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>7A60807E-4053-DC58-AEE3-29951D1B354F</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>B05B60C8-CCA1-838D-4CCB-A85489297AC3</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="end_date" id="67422486-132F-97BF-BEE4-123229A2EDFE">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>AF8EBF62-77D4-75AD-EAF8-6F341FDB4459</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>B05B60C8-CCA1-838D-4CCB-A85489297AC3</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="initial_capital" id="9F04076B-25D3-3EFA-CA83-9BB44C95B428">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>7D876456-3BAF-3973-3D71-3EAA0E5D4DD1</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9AF82216-2346-AFC6-7292-DB4D3EE8B07D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="final_capital" id="9B4427C3-4F8C-5B04-34C7-336F65D85EAB">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>C4683AF8-B466-E34C-DB9C-CC49D65F4A8D</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9AF82216-2346-AFC6-7292-DB4D3EE8B07D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="total_return" id="01E487CB-3339-2E9B-804E-47169BFC1E69">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>84B734E1-8420-57E0-24AF-5CC14584ACDB</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="sharpe_ratio" id="EA60E9AA-6BE1-9DF7-9E9C-BF5B06CB027A">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>30244343-48E6-428A-C5CC-91EB6EA35999</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="max_drawdown" id="264807A6-1807-7CD9-7619-82EB0B85D51D">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>8B042110-1DC4-EC2D-70D0-ED8028FC340B</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="win_rate" id="CC62D541-F059-F671-8F46-9914BF350031">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>9D9E26A7-080A-548F-FDE7-3B622ECF0FF5</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>CD4CA0C0-33B0-9180-07F7-B21893888BCF</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="total_trades" id="63A44DD3-3218-C6CC-9C77-1D813EBE0159">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>C51FE132-577B-8967-3234-A9A63935AC19</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>7A46DD54-66FB-4730-75B5-2B74B50ABE3D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="trades" id="86D162A0-092A-62CC-960F-1492764CF5DF">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>D51318C2-CBDF-8A76-9F2D-58215E63E6B8</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT028</logicalDatatype>
+<domain>1903A228-9DB4-1172-009E-FCFB5DECECAC</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="created_at" id="AC59B1ED-221A-F5D1-133E-BD7F8AF965E1">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>2633257D-EC47-5E05-61B1-8B197CABCDEA</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT015</logicalDatatype>
+<domain>69F06C27-74F7-D0B7-31F0-B3D408D30107</domain>
+<defaultValue>SYSTIMESTAMP</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="95A4FED9-5277-1A47-272F-F894C81F6BAE" name="backtest_results_PK">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>2225BFD7-7447-B6E2-2239-31CC97D41B66</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2A21FE60-8D7A-B3A8-9780-34A18197DAEC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C9CBCAF9-F7FF-4AFC-6D13-DC1717DDF85B" name="idx_backtest_results_strategy_id">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>6980F30D-3387-09BB-CFCF-B9BB7C462F27</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="76561DF7-05FF-3D50-B94A-B104337ED5D6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C95B7DB8-7871-4DFD-EC99-FE3255B7BC62" name="idx_backtest_results_symbol">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>ACAF9A4F-FD22-5FAB-CED5-B260B16F957D</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="93500D79-9301-7A98-574D-A250FDA0A618"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="403F213F-C366-B1C0-E025-61FCC0908033" name="backtest_results_strategies_FK">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="76561DF7-05FF-3D50-B94A-B104337ED5D6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

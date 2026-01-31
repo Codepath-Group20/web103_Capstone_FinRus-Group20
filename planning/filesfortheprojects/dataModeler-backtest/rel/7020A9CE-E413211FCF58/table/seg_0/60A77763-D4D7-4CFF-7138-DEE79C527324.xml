@@ -1,0 +1,177 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="60A77763-D4D7-4CFF-7138-DEE79C527324" name="portfolio_positions">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>D1AC7DD5-081F-5ECA-EEDC-18AACAFC3CBF</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="FFE71590-A17C-5526-9509-8CCE1C4DBC3D">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>83DEAD56-C002-4166-70D2-10ACB06E4393</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>7A46DD54-66FB-4730-75B5-2B74B50ABE3D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="portfolio_id" id="064023E8-C743-E79F-E3EC-37B58BC3EA5E">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>2E12B265-31FA-91B1-69FC-2F4479A649D5</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>7A46DD54-66FB-4730-75B5-2B74B50ABE3D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="D846C481-DAAC-532F-D545-3F7EB07B0D20" referredColumn="C9BB9576-B420-5CA5-4510-72A1A5729BBA"/>
+</associations>
+</Column>
+<Column name="symbol" id="B7F6E540-7472-F373-8389-D31A52D74251">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>156EA4D2-3A95-B0BC-E7D4-127E10A8A0AC</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>FD222237-A041-0A93-84FC-61C10042D1CB</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="quantity" id="1EEF7B3F-ACCE-D085-8AEA-590E3C208B33">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>0CAE9A58-F702-BCD5-8F5B-26A5FE057436</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>7A46DD54-66FB-4730-75B5-2B74B50ABE3D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="average_price" id="73C739B3-E690-9EC3-2F78-FF7C5372E5CB">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>8DBB5529-E2AC-C600-1B1C-3A226D54A4DE</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="current_price" id="86CE790D-310A-F631-ED19-278CE2F6AA55">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>5F9DA6D0-54C7-03C0-7894-5A800186EAF2</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>8E008D6E-32E1-00E7-BF4F-B0D0395E45D6</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="unrealized_pnl" id="1A861875-B072-6803-64A1-002699F5FF0F">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>99528F5D-47DD-DE7B-5A8B-D6D1C4169DBE</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9AF82216-2346-AFC6-7292-DB4D3EE8B07D</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="created_at" id="DB9A55D1-6012-DF43-E989-14C6F5836302">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>8DB72A72-3973-77F3-3E8B-2A4F829D6727</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT015</logicalDatatype>
+<domain>69F06C27-74F7-D0B7-31F0-B3D408D30107</domain>
+<defaultValue>SYSTIMESTAMP</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="updated_at" id="A1A237DD-9A45-C5CF-D76B-F08CFA0038FE">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>F19F02D3-0A0A-AB7C-4A2D-0581B7DBEE03</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT015</logicalDatatype>
+<domain>69F06C27-74F7-D0B7-31F0-B3D408D30107</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A3453994-7FD3-89D8-CE6B-50A2800F8210" name="portfolio_positions_PK">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>65CF3BC4-9A11-A4CA-E43A-252D6A89A8DC</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="FFE71590-A17C-5526-9509-8CCE1C4DBC3D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="4BD3430D-0D51-2090-BD9D-BD13A099F7F2" name="idx_portfolio_positions_portfolio_id">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>4383B64C-576E-31B2-4892-A7CCE3D50FBF</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="064023E8-C743-E79F-E3EC-37B58BC3EA5E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="FEEF6FDB-B036-1B08-681F-65C046D19E5B" name="idx_portfolio_positions_symbol">
+<sourceDDLFile>schema_oracle.sql</sourceDDLFile>
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<importedID>EE4D12BC-CD3C-6081-6D1B-ED025F973981</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B7F6E540-7472-F373-8389-D31A52D74251"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="9758AA99-9B6C-D39D-6126-72317320145D" name="portfolio_positions_portfolios_FK">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:50:44 UTC</createdTime>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="064023E8-C743-E79F-E3EC-37B58BC3EA5E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

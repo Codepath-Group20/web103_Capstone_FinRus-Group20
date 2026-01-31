@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="backtest_results_strategies_FK" directorySegmentName="seg_0" id="A1670AD7-D8AD-84FC-5BD7-D6C27523A147">
+<createdBy>leo</createdBy>
+<createdTime>2026-01-30 23:52:21 UTC</createdTime>
+<generatorID>46014420-FFA4-1A02-91F4-584B6B47825D</generatorID>
+<ownerDesignName>dataModeler-backtest</ownerDesignName>
+<engineerTo>
+<item key="7020A9CE-2981-2A6B-E618-E413211FCF58" value="true"/>
+</engineerTo>
+<sourcePk>3FD3D6BE-9C82-43DB-5306-6CF6AEBB822B</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>7558C7C8-9544-E28B-C347-E113185093B5</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>235DE129-B8D5-1284-06B0-8B753B937309</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>
